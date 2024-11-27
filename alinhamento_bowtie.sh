@@ -1,20 +1,28 @@
 #!/bin/bash
 
+#Verificar se o microambiente está ativado
+
+# Diretório que contém os arquivos para alinhamento
+diretorio=$(pwd)
+
+
 # Obter o arquivo FASTA de referência
 echo "Arquivo FASTA de referência: "
 read fasta
 
 # Limpar a área de trabalho
-rm *.sam
-rm *.log
-rm *.ebwt
+if find "$diretorio" -type f \( -name "*.sam" -o -name "*.log" -o -name "*.ebwt" \) | grep -q .; then
+    echo "Arquivos encontrados. Limpando..."
+    # Apagar os arquivos com as extensões .sam, .log e .ebwt no diretório e subdiretórios
+    find "$diretorio" -type f \( -name "*.sam" -o -name "*.log" -o -name "*.ebwt" \) -exec rm -f {} \;
+    echo "Arquivos limpos com sucesso."
+else
+    echo "Nenhum arquivo para limpar."
+fi
 
 # Gerar os arquivos do índice Bowtie
 fasta_index="${fasta%.*}"
 bowtie-build "$fasta" "$fasta_index"
-
-# Diretório que contém os arquivos para alinhamento
-diretorio=$(pwd)
 
 #Pergunta qual o valor dos parâmetros:
 echo "Quantos alinhamentos você quer por leitura? (valor de -k) "
